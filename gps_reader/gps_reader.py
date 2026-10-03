@@ -1,15 +1,12 @@
 import serial
+import pynmea2
 
 UART_PORT = "/dev/ttyAMA0"
 BAUD_RATE = 9600
 
 
 def main():
-    gps = serial.Serial(
-        port=UART_PORT,
-        baudrate=BAUD_RATE,
-        timeout=1
-    )
+    gps = serial.Serial(UART_PORT, BAUD_RATE, timeout=1)
 
     print(f"GPS reader started: {UART_PORT} @ {BAUD_RATE}")
 
@@ -17,8 +14,23 @@ def main():
         while True:
             line = gps.readline().decode("ascii", errors="ignore").strip()
 
-            if line:
-                print(line)
+            if not line.startswith("$"):
+                continue
+
+            try:
+                message = pynmea2.parse(line)
+
+                if isinstance(message, pynmea2.types.talker.GGA):
+                    print(
+                        f"Lat: {message.latitude:.6f}, "
+                        f"Lon: {message.longitude:.6f}, "
+                        f"Altitude: {message.altitude} m, "
+                        f"Satellites: {message.num_sats}, "
+                        f"Fix: {message.gps_qual}"
+                    )
+
+            except pynmea2.ParseError:
+                pass
 
     except KeyboardInterrupt:
         print("\nGPS reader stopped")
