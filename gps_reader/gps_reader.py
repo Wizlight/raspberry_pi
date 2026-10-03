@@ -5,8 +5,27 @@ UART_PORT = "/dev/ttyAMA0"
 BAUD_RATE = 9600
 
 
+def configure_gps(gps):
+    command = bytes([
+        0xB5, 0x62,
+        0x06, 0x08,
+        0x06, 0x00,
+        0xE8, 0x03,
+        0x01, 0x00,
+        0x00, 0x00,
+        0x00, 0x37
+    ])
+
+    gps.write(command)
+    gps.flush()
+
+    print("GPS configured: 1 Hz")
+
+
 def main():
     gps = serial.Serial(UART_PORT, BAUD_RATE, timeout=1)
+
+    configure_gps(gps)
 
     print(f"GPS reader started: {UART_PORT} @ {BAUD_RATE}")
 

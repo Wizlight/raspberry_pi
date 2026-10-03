@@ -1,0 +1,14 @@
+[Unit]
+Description=GPS Reader
+After=multi-user.target
+
+[Service]
+Type=simple
+User=wizlight
+WorkingDirectory=/home/wizlight/Projects/raspberry_pi
+ExecStart=/home/wizlight/Projects/raspberry_pi/.venv/bin/python -u /home/wizlight/Projects/raspberry_pi/gps_reader/gps_reader.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
